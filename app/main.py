@@ -173,7 +173,7 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         answers = context.user_data["answers"]
         with Session(engine) as session:
             stmt = select(User).where(User.telegram_handle == user.username)
-            target = session.scalars(stmt).one()
+            target = session.scalars(stmt).one() # execute the stmt n return the user
             target.set_score(answers)
             session.commit()
         await update.message.reply_text(
@@ -185,6 +185,14 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     
 async def match(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user = update.message.from_user
+    # user object
+    with Session(engine) as session:
+        stmt = select(User).where(User.telegram_handle == user.username)
+        target = session.scalars(stmt).one()
+        date_gender = target.gender ^ 1
+        stmt = select(User).where(User.gender == date_gender)
+        opp_gender_users = session.scalars(stmt).all()
+
     await update.message.reply_text(
         "I have helped you find out the top 3 fittest dates for you. Their telegram handles are:"
         ""
