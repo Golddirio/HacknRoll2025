@@ -30,9 +30,10 @@ class User(Base):
     def set_gender(self, gender):
         self.gender = gender
     
-    def append_q_score(self, score):
+    def set_score(self, scores):
         obj = json.loads(self.scores)
-        obj["scores"].append(score)
+        for score in score:
+            obj["scores"].append(score)
         self.scores = json.dumps(obj)
      
     def vectorize_scores(self):
