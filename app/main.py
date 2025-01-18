@@ -91,17 +91,11 @@ async def gender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def asking_age(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Asks the user about their age."""
-    reply_keyboard=[["Cancel"]]
-
     await update.message.reply_text(
         "Hi! I am Cupid."
         "Send /cancel to stop talking to me.\n\n"
         "What is your age?",
-        reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard,
-            one_time_keyboard=True,
-            input_field_placeholder="Let me know your age.",
-        ),
+        reply_markup=ReplyKeyboardRemove()
     )
 
     return 0
@@ -188,6 +182,7 @@ async def match(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     with Session(engine) as session:
         stmt = select(User).where(User.telegram_handle == user.username)
         target = session.scalars(stmt).one()
+        
         date_gender = target.gender ^ 1
         stmt = select(User).where(User.gender == date_gender)
         opp_gender_users = session.scalars(stmt).all()
@@ -224,7 +219,6 @@ async def help(update, context):
 def main():
     application = ApplicationBuilder().token(Token).build()
     application.add_handler(CommandHandler("start", start))
-    """application.add_handler(CommandHandler("quiz", quiz))"""
     application.add_handler(CommandHandler("match", match))
     application.add_handler(CommandHandler("help", help))
     application.add_handler(CommandHandler("deleteaccount", delete))
