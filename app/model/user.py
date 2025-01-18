@@ -2,6 +2,7 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 import json
+import numpy as np
 
 class Base(DeclarativeBase):
     pass
@@ -34,3 +35,5 @@ class User(Base):
         obj["scores"].append(score)
         self.q_score = json.dumps(obj)
      
+    def vectorize_scores(self):
+        return np.array(json.loads(self.q_score)["scores"])

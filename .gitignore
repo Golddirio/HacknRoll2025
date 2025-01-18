@@ -5,3 +5,4 @@ __pycache__/
 env/
 venv
 *_test.py
+test.db
