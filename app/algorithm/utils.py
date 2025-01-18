@@ -30,22 +30,21 @@ def convert_distances(pairs: List[Pair]):
     return list(map(f, pairs[1:]))
 
 def quick_select(pairs: List[Tuple[int, float]], k):
-    return quick_select_helper(pairs, 0, len(pairs) - 1, k)
+    quick_select_helper(pairs, 0, len(pairs) - 1, k)
+    return pairs[:k]
 
 def quick_select_helper(xs: List[Tuple[int, float]], left, right, k):
-    while left < right:
-        
+    if left < right: 
         index = partition(xs, left, right)
         # print(index)
-        if index == k:
-            return xs[:k]
+        
+        count = index + 1
+        if count == k:
+            return
         elif k < index:
-            quick_select_helper(xs, left, index - 1, k)
+            return quick_select_helper(xs, left, index - 1, k)
         else:
-            quick_select_helper(xs, index + 1, left, k - index)
-    
-    return xs[:k + 1]
-    
+            return quick_select_helper(xs, index + 1, left, k - count)
     
 def partition(xs: List[Tuple[int, float]], left: int, right: int):
     p = xs[left]
