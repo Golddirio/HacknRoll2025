@@ -4,8 +4,7 @@ from telegram.ext import (
     ContextTypes,
     CommandHandler,
     MessageHandler,
-    filters,
-    PrefixHandler,
+    filters,    
     ConversationHandler,
 )
 from app.model.user import User, Base
