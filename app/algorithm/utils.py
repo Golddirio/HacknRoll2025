@@ -1,4 +1,3 @@
-import random
 from typing import List, Tuple
 from sklearn.decomposition import PCA
 import numpy as np 
