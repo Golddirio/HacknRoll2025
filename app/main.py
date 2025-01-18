@@ -7,6 +7,8 @@ from telegram.ext import (
     filters,    
     ConversationHandler,
 )
+from app.algorithm.Pair import Pair
+from app.algorithm.utils import convert_distances, perform_pca, quick_select
 from app.model.user import User, Base
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
@@ -188,13 +190,27 @@ async def match(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     with Session(engine) as session:
         stmt = select(User).where(User.telegram_handle == user.username)
         target = session.scalars(stmt).one()
+        session.commit()
+        
+    with Session(engine) as session:
         date_gender = target.gender ^ 1
         stmt = select(User).where(User.gender == date_gender)
-        opp_gender_users = session.scalars(stmt).all()
+        opp_gender_users_tmp = session.scalars(stmt).all()
+        session.commit()
+    
+    # Extract vector of score including age
+    target_xs = [Pair(target.id, target.vectorize_scores())]
+    for u in opp_gender_users_tmp:
+        p = Pair(u.id, u.vectorize_scores())
+        target_xs.append(p)
+        
+    reduced_target_xs = perform_pca(target_xs)
+    distance_xs = convert_distances(reduced_target_xs)
+    top_3 = quick_select(distance_xs, 3)
 
     await update.message.reply_text(
         "I have helped you find out the top 3 fittest dates for you. Their telegram handles are:"
-        ""
+        f"{top_3}"
         "Please feel free to strike a conversation and begin with a hello.",
         reply_markup=ReplyKeyboardRemove()
     )
