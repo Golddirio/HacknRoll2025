@@ -36,7 +36,7 @@ def quick_select_helper(xs: List[Tuple[int, float]], left, right, k):
     while left < right:
         
         index = partition(xs, left, right)
-        print(index)
+        # print(index)
         if index == k:
             return xs[:k]
         elif k < index:
