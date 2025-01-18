@@ -14,26 +14,28 @@ class User(Base):
     telegram_handle: Mapped[str] = mapped_column(nullable=False)
     gender: Mapped[int]
     age: Mapped[int]
-    q_score: Mapped[str] = mapped_column(nullable=False)
+    scores: Mapped[str] = mapped_column(nullable=False)
     
     def __init__(self, telegram_handle):
         self.telegram_handle = telegram_handle
         data = {"scores": []}
         obj = json.dumps(data)
-        self.q_score = obj
+        self.scores = obj
         self.age = -1
         self.gender = -1
     
     def set_age(self, age):
         self.age = age
     
-    def ser_gender(self, gender):
+    def set_gender(self, gender):
         self.gender = gender
     
     def append_q_score(self, score):
-        obj = json.loads(self.q_score)
+        obj = json.loads(self.scores)
         obj["scores"].append(score)
-        self.q_score = json.dumps(obj)
+        self.scores = json.dumps(obj)
      
     def vectorize_scores(self):
-        return np.array(json.loads(self.q_score)["scores"])
+        tmp = json.loads(self.scores)["scores"]
+        tmp.append(self.age)
+        return np.array(tmp)
