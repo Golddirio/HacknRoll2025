@@ -36,7 +36,6 @@ def quick_select(pairs: List[Tuple[int, float]], k):
 def quick_select_helper(xs: List[Tuple[int, float]], left, right, k):
     if left < right: 
         index = partition(xs, left, right)
-        # print(index)
         
         count = index + 1
         if count == k:
@@ -63,7 +62,6 @@ def partition(xs: List[Tuple[int, float]], left: int, right: int):
         temp = xs[j]
         xs[j] = xs[i]
         xs[i] = temp
-    # print(j) 
     temp = xs[left]
     xs[left] = xs[i]
     xs[i] = temp
