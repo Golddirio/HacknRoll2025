@@ -32,7 +32,7 @@ class User(Base):
     
     def set_score(self, scores):
         obj = json.loads(self.scores)
-        for score in score:
+        for score in scores:
             obj["scores"].append(score)
         self.scores = json.dumps(obj)
      
