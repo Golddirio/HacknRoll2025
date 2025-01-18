@@ -27,12 +27,18 @@ Base.metadata.create_all(engine)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with Session(engine) as session:
         user = User(update.effective_user.username)
-        session.add(user)
-        session.commit()
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} I'm Cupid! Tell me more about yourself.",
-    )
+        if session.query(User).filter(User.telegram_handle == user.telegram_handle).count() == 0:
+            session.add(user)
+            session.commit()
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} I'm a bot, please talk to me!",
+            )
+        else:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} has registered already",
+            )
 
 # conversational bot
 async def asking_gender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -145,6 +151,7 @@ async def starting_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     return 0
 
 async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int: 
+    user = update.message.from_user
     reply_keyboard = [["1", "2", "3", "4", "5"]]
     curr_ans = int(update.message.text)
     context.user_data["answers"].append(curr_ans)
@@ -164,8 +171,11 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         return 0
     else:
         answers = context.user_data["answers"]
-
-
+        with Session(engine) as session:
+            stmt = select(User).where(User.telegram_handle == user.username)
+            target = session.scalars(stmt).one()
+            target.set_score(answers)
+            session.commit()
         await update.message.reply_text(
             "Thank you for completing the quiz. Cupid will help you match if you input /match",
             reply_markup=ReplyKeyboardRemove()
