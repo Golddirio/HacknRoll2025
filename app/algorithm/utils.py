@@ -13,7 +13,6 @@ def compare_tuples(t1, t2):
 
 def perform_pca(pairs: List[Pair]):
     vectors = list(map(lambda x : x.xs, pairs))
-    print(vectors)
     original = np.vstack(vectors)
     pca = PCA(n_components=3)
     reduced_data = pca.fit_transform(original)
