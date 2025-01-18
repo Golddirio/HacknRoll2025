@@ -186,21 +186,21 @@ async def match(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         target = session.scalars(stmt).one()
         session.commit()
         
-    with Session(engine) as session:
         date_gender = target.gender ^ 1
         stmt = select(User).where(User.gender == date_gender)
         opp_gender_users_tmp = session.scalars(stmt).all()
         session.commit()
     
-    # Extract vector of score including age
-    target_xs = [Pair(target.id, target.vectorize_scores())]
-    for u in opp_gender_users_tmp:
-        p = Pair(u.id, u.vectorize_scores())
-        target_xs.append(p)
+        # Extract vector of score including age
+        target_xs = [Pair(target.id, target.vectorize_scores())]
+    
+        for u in opp_gender_users_tmp:
+            p = Pair(u.id, u.vectorize_scores())
+            target_xs.append(p)
         
-    reduced_target_xs = perform_pca(target_xs)
-    distance_xs = convert_distances(reduced_target_xs)
-    top_3 = quick_select(distance_xs, 3)
+        reduced_target_xs = perform_pca(target_xs)
+        distance_xs = convert_distances(reduced_target_xs)
+        top_3 = quick_select(distance_xs, 3)
 
     await update.message.reply_text(
         "I have helped you find out the top 3 fittest dates for you. Their telegram handles are:"
