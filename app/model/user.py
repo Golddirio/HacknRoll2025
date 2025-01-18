@@ -30,11 +30,11 @@ class User(Base):
     def set_gender(self, gender):
         self.gender = gender
     
-    def set_score(self, scores):
-        obj = json.loads(self.scores)
-        for score in scores:
+    def set_score(self, scs):
+        obj = json.loads(self.scores) #dict in json must have key 
+        for score in scs:
             obj["scores"].append(score)
-        self.scores = json.dumps(obj)
+        self.scores = json.dumps(obj) #string 
      
     def vectorize_scores(self):
         tmp = json.loads(self.scores)["scores"]
