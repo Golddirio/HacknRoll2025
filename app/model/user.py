@@ -18,7 +18,7 @@ class User(Base):
     
     def __init__(self, telegram_handle):
         self.telegram_handle = telegram_handle
-        data = {"scores": []}
+        data = {"scores": [0 for i in range(8)]}
         obj = json.dumps(data)
         self.scores = obj
         self.age = -1
@@ -32,8 +32,8 @@ class User(Base):
     
     def set_score(self, scs):
         obj = json.loads(self.scores) #dict in json must have key 
-        for score in scs:
-            obj["scores"].append(score)
+        for s in range(len(scs)):
+            obj["scores"][s] = scs[s]
         self.scores = json.dumps(obj) #string 
      
     def vectorize_scores(self):
