@@ -40,3 +40,15 @@ class User(Base):
         tmp = json.loads(self.scores)["scores"]
         tmp.append(self.age)
         return np.array(tmp)
+    
+    def has_complete_score(self):
+        scores = json.loads(self.scores)["scores"]
+        return not(0 in scores)
+    
+    def has_complete_age(self):
+        return self.age != -1
+    
+    def has_complete_gender(self):
+        return self.gender != -1
+    
+    
