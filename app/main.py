@@ -15,6 +15,8 @@ from sqlalchemy.orm import Session
 import os 
 from dotenv import load_dotenv
 
+from app.utils.utils import format_handle_list
+
 
 
 load_dotenv()
@@ -201,10 +203,16 @@ async def match(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         reduced_target_xs = perform_pca(target_xs)
         distance_xs = convert_distances(reduced_target_xs)
         top_3 = quick_select(distance_xs, 3)
-
+        final_list = []
+        for each in top_3:
+            with Session(engine) as session:
+                stmt = select(User).where(User.id == each[0])
+                curr_user = session.scalars(stmt).one()
+                session.commit()
+                final_list.append(curr_user.telegram_handle)
     await update.message.reply_text(
-        "I have helped you find out the top 3 fittest dates for you. Their telegram handles are:"
-        f"{top_3}"
+        "I have helped you find out the top 3 fittest dates for you. Their telegram handles are:\n"
+        f"{format_handle_list(final_list)}\n"
         "Please feel free to strike a conversation and begin with a hello.",
         reply_markup=ReplyKeyboardRemove()
     )
