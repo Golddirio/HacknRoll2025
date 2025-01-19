@@ -5,7 +5,7 @@ The product built for Hack&amp;Roll 2025.
 Looking for a spark? Cupid Arrow on Telegram brings love and connection closer than ever. With instant matching, private chats, and a fun, user-friendly experience, finding your special someone has never been easier. Join the Cupid community today and let love strike where you least expect it! 💬❤️
 
 ### Inspiration
-Looking for a spark? Cupid Arrow is the ultimate Telegram bot designed to bring love and connection closer than ever. With its smart matching algorithm, Cupid Arrow scours its database to find the best match for you. Enjoy private, seamless chats and a fun, user-friendly experience that makes meeting someone special effortless.💘 
+Looking for a spark? Cupid Arrow is the ultimate Telegram bot designed to bring love and connection closer than ever. With its smart matching algorithm, Cupid Arrow scours its database to find the top 3 best matches for you. Enjoy private, seamless chats and a fun, user-friendly experience that makes meeting someone special effortless.💘 
 
 Just a few taps away: share your preferences, let the bot work its magic, and connect with like-minded individuals instantly.
 
@@ -16,9 +16,9 @@ Cupid Arrow Telegram bot facilitates seamless matchmaking by performing the foll
 
 User Initialization: When the user initiates the bot with /start, the bot welcomes them and creates a user profile in its database.
 
-Matching Requests: Users can request matches based on their preferences. If the user hasn't taken the quiz or if the quiz is outdated, the bot redirects them to take the quiz (UC3). Otherwise, it runs its matching algorithm to identify and return the top 3-10 most compatible matches.
+Matching Requests: Users can request matches based on their preferences. Before taking the quiz, the user can input hhis gender and age. If the user hasn't taken the quiz or if the quiz is outdated, the bot redirects them to take the quiz. Otherwise, it runs its matching algorithm to identify and return the top 3 most compatible matches.
 
-User Quiz: The bot gathers detailed user preferences by prompting a series of quiz questions. User responses update their profile in real-time to enhance matchmaking accuracy.
+User Quiz: The bot gathers detailed user preferences by prompting a series of 8 quiz questions. User responses update their profile in real-time to enhance matchmaking accuracy.
 
 Account Removal: Users can request to delete their account, and the bot ensures all associated data is removed from its database.
 
@@ -76,6 +76,9 @@ Ensuring efficient data handling, from storing user profiles in SQLite to managi
 
 ### What we learned
 
+Firstly, we gained valuable experience in building a Telegram bot using the Python-Telegram-Bot API for the first time. We explored the entire process of learning the new API and developed an understanding of how to create a seamless and intuitive Telegram user experience from scratch.
+
+Secondly, we had the opportunity to deepen our knowledge of relevant algorithms, such as QuickSelect. Additionally, we thoroughly examined the application of a combination of Principal Component Analysis (PCA) and Euclidean distance. This helped us become familiar with effective matching algorithms, particularly for scenarios involving high-dimensional metric spaces.
 
 ### Built With
 anyio==4.8.0
@@ -97,3 +100,4 @@ threadpoolctl==3.5.0
 typing_extensions==4.12.2
 
 ### Try it out
+@CAGolddirio123_bot
