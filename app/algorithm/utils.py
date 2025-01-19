@@ -1,7 +1,13 @@
+import random
 from typing import List, Tuple
 from sklearn.decomposition import PCA
 import numpy as np 
 from app.algorithm.Pair import Pair
+
+def swap_index(xs: List[any], i: int, j: int):
+    temp = xs[i]
+    xs[i] = xs[j]
+    xs[j] = temp
 
 def compare_tuples(t1, t2):
     if t1[1] < t2[1]:
@@ -34,25 +40,26 @@ def quick_select(pairs: List[Tuple[int, float]], k):
 
 def quick_select_helper(xs: List[Tuple[int, float]], left, right, k):
     if left < right: 
+        pivot = random.randint(left, right)
+        swap_index(xs, pivot, left)
         index = partition(xs, left, right)
-        
-        count = index + 1
+        count = index - left + 1 
         if count == k:
             return
-        elif k < index:
+        elif k < count:
             return quick_select_helper(xs, left, index - 1, k)
         else:
-            return quick_select_helper(xs, index + 1, left, k - count)
+            return quick_select_helper(xs, index + 1, right, k - count)
     
 def partition(xs: List[Tuple[int, float]], left: int, right: int):
     p = xs[left]
     i = left + 1
     j = right
     while True:
-        while i < right and compare_tuples(xs[i], p) < 0:
+        while i <= right and compare_tuples(xs[i], p) < 0:
             i += 1
         
-        while j >= left and compare_tuples(xs[j], p) > 0:
+        while j > left and compare_tuples(xs[j], p) > 0:
             j -= 1
         
         if i >= j:
@@ -61,10 +68,11 @@ def partition(xs: List[Tuple[int, float]], left: int, right: int):
         temp = xs[j]
         xs[j] = xs[i]
         xs[i] = temp
+    
     temp = xs[left]
-    xs[left] = xs[i]
-    xs[i] = temp
-    return i
+    xs[left] = xs[j]
+    xs[j] = temp
+    return j
 
 
     
