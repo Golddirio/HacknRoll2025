@@ -10,7 +10,7 @@ from telegram.ext import (
 from app.algorithm.Pair import Pair
 from app.algorithm.utils import convert_distances, perform_pca, quick_select
 from app.model.user import User, Base
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, select, delete
 from sqlalchemy.orm import Session
 import os 
 from dotenv import load_dotenv
@@ -35,12 +35,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             session.commit()
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} I'm a bot, please talk to me!",
+                text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} I'm Cupid carrying arrows of love. I will help you find the best matches",
             )
         else:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} has registered already",
+                text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} has been memorisied by me already. Just wait for others to text you!",
             )
 
 # conversational bot
@@ -220,17 +220,31 @@ async def match(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int: 
     user = update.message.from_user
-    await update.message.reply_text(
-        "I have erased all the memories about you. See you next time.",
-        reply_markup=ReplyKeyboardRemove()
-    )
+    with Session(engine) as session:
+        stmt = select(User).where(User.telegram_handle == user.username)
+        target = session.scalars(stmt).one_or_none()
+    
+        if target:
+            session.delete(target)
+            session.commit()
+            await update.message.reply_text(
+                "I have erased all the memories about you. See you next time.",
+                reply_markup=ReplyKeyboardRemove()
+            ) 
+        else:
+            await update.message.reply_text(
+                "I have never chatted with you before. No memories about you can be erased from me.",
+                reply_markup=ReplyKeyboardRemove()
+            )
+            
+    
 
 
 
 async def help(update, context):
     user = update.message.from_user
     await update.message.reply_text(
-        "I am cupid who can help you match with the top fits of possible dates after you tell us your gender, age and finishing the quiz.",
+        "I am Cupid who can help you match with the top fits of possible dates after you tell us your gender, age and finishing 8 quizes.",
         
     )
     return ConversationHandler.END
@@ -241,6 +255,17 @@ async def help(update, context):
 
 def main():
     application = ApplicationBuilder().token(Token).build()
+
+    # conv_handler = ConversationHandler(
+    #     entry_points=[CommandHandler("start", start)],
+    #     states={
+    #         GENDER: [
+
+    #         ] 
+    #     }
+    # )
+
+
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("match", match))
     application.add_handler(CommandHandler("help", help))
