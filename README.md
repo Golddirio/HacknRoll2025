@@ -40,12 +40,42 @@ Dimensionality Reduction: Apply PCA to project v and S into 3D space, improving 
 Quick Selection: Use the quick select algorithm to find the k-th closest vector efficiently.
 
 ### Accomplishments that we're proud of
-
+Advanced Matching Algorithm:   
+Successfully implemented a robust matchmaking algorithm that utilizes PCA for dimensionality reduction and quick select for efficient and accurate user matching.
+  
+Streamlined User Experience:  
+Designed an intuitive, user-friendly interface using the python-telegram-bot API, ensuring seamless interactions between users and the bot.  
+  
+Efficient Data Handling:  
+Integrated a lightweight SQLite database for efficient storage and management of user data, allowing fast retrieval and processing during matches.  
+  
+Data-Driven Insights:  
+Leveraged cutting-edge tools like numpy and scikit-learn to preprocess user data and ensure high accuracy in match recommendations.  
+  
+Scalability and Optimization:  
+Utilized Principal Component Analysis (PCA) to optimize the computational performance of the matchmaking algorithm, reducing complexity and improving scalability.
+  
+Comprehensive Privacy Controls:   
+Empowered users with control over their data by implementing an account deletion feature that ensures secure removal of user information from the database.
+  
 ### Challenges we ran into
-1. Explore on the correct algorithm for matching
-2. Learn telegram API
+Exploring the Correct Algorithm for Matching:   
+Finding an efficient and accurate matching algorithm was a key challenge. While k-d trees were considered, their computational expense for constructing new trees led us to utilize the quick select algorithm.
+   
+Learning Telegram API:  
+Understanding the python-telegram-bot API to handle user interactions, bot commands, and error scenarios was a learning curve. Integrating the bot's logic with real-time user inputs demanded a thorough understanding of the API's capabilities and limitations.  
+   
+Sorting with Quick Select:  
+Adapting the quick select algorithm for sorting user data based on proximity in reduced dimensions was challenging. Implementing it efficiently while maintaining accuracy and managing edge cases required meticulous attention to algorithm design and debugging.  
+  
+Dimensionality Reduction with PCA:  
+Applying PCA to reduce the dimensions of user data was another hurdle. Ensuring that the reduced dimensions retained enough meaningful information for accurate matches involved careful tuning and validation.  
+  
+Data Management and Privacy:  
+Ensuring efficient data handling, from storing user profiles in SQLite to managing real-time updates, was critical. Additionally, implementing a robust account deletion mechanism to address privacy concerns required precision and care.  
 
 ### What we learned
+
 
 ### Built With
 anyio==4.8.0
