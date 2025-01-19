@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 
 from app.utils.utils import format_handle_list
 
+ASKING_GENDER, GENDER, ASKING_AGE, AGE, STARTING_QUIZ, QUIZ, MATCH = range(7)
 
 
 load_dotenv()
@@ -27,7 +28,7 @@ engine = create_engine("sqlite:///data.db", echo=True)
 Base.metadata.create_all(engine)
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     with Session(engine) as session:
         user = User(update.effective_user.username)
         if session.query(User).filter(User.telegram_handle == user.telegram_handle).count() == 0:
@@ -35,13 +36,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             session.commit()
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} I'm Cupid carrying arrows of love. I will help you find the best matches",
+                text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} I'm Cupid carrying arrows of love. I will help you find the best matches. To begin, use /gender to choose your gender.",
             )
         else:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} has been memorisied by me already. Just wait for others to text you!",
+                text=f"Hi {update.effective_user.first_name} {update.effective_user.last_name} has been memorisied by me already. Just wait for others to text you or you can be forgotten by me using /deleteme!",
             )
+    return ASKING_GENDER
 
 # conversational bot
 async def asking_gender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -59,10 +61,9 @@ async def asking_gender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         ),
     )
 
-    return 0
+    return GENDER
 
 async def cancel(update, context):
-    user = update.message.from_user
     await update.message.reply_text(
         "Bye! I hope we can talk again some day.", reply_markup=ReplyKeyboardRemove()
     )
@@ -87,22 +88,22 @@ async def gender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         session.commit()
         
     await update.message.reply_text(
-        f"I see! So {user.first_name} {user.last_name} is a {input}",
+        f"I see! So {user.first_name} {user.last_name} is a {input}. Now you can tell me your age using /age. ",
         reply_markup=ReplyKeyboardRemove(),
     )
 
-    return ConversationHandler.END
+    return ASKING_AGE
 
 async def asking_age(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Asks the user about their age."""
     await update.message.reply_text(
-        "Hi! I am Cupid."
+        "Hi! Cupid again."
         "Send /cancel to stop talking to me.\n\n"
         "What is your age?",
         reply_markup=ReplyKeyboardRemove()
     )
 
-    return 0
+    return AGE
 
 async def age(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_input = update.message.text
@@ -114,10 +115,11 @@ async def age(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             target = session.scalars(stmt).one()
             target.set_age(age)
             session.commit()
-        await update.message.reply_text(f"Thanks! I have recorded your age as {age}.")
+        await update.message.reply_text(f"Thanks! I have recorded your age as {age}. Next you can take the quiz using /quiz. If you want to roll back your answer, using /age again.")
+        return STARTING_QUIZ
     else: 
         await update.message.reply_text("Please enter a valid number.")
-    return ConversationHandler.END
+        return AGE
 
     
 async def starting_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -145,7 +147,7 @@ async def starting_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
             input_field_placeholder="Choose a number between 1 and 5."
         )
     )
-    return 0
+    return QUIZ
 
 async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int: 
     user = update.message.from_user
@@ -165,7 +167,7 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
                 input_field_placeholder="Choose a number between 1 and 5."
             )
         )
-        return 0
+        return QUIZ
     else:
         answers = context.user_data["answers"]
         with Session(engine) as session:
@@ -178,7 +180,7 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             reply_markup=ReplyKeyboardRemove()
         )
         context.user_data.clear()
-        return ConversationHandler.END 
+        return MATCH
     
 async def match(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user = update.message.from_user
@@ -216,6 +218,7 @@ async def match(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         "Please feel free to strike a conversation and begin with a hello.",
         reply_markup=ReplyKeyboardRemove()
     )
+    return ConversationHandler.END
 
 
 async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int: 
@@ -228,14 +231,15 @@ async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             session.delete(target)
             session.commit()
             await update.message.reply_text(
-                "I have erased all the memories about you. See you next time.",
+                "I have erased all the memories about you. See you next time. If you want to start again, using /start.",
                 reply_markup=ReplyKeyboardRemove()
             ) 
         else:
             await update.message.reply_text(
-                "I have never chatted with you before. No memories about you can be erased from me.",
+                "I have never chatted with you before. No memories about you can be erased from me. You can start the conversation with me using /start.",
                 reply_markup=ReplyKeyboardRemove()
             )
+    return ConversationHandler.END
             
     
 
@@ -255,44 +259,22 @@ async def help(update, context):
 
 def main():
     application = ApplicationBuilder().token(Token).build()
-
-    # conv_handler = ConversationHandler(
-    #     entry_points=[CommandHandler("start", start)],
-    #     states={
-    #         GENDER: [
-
-    #         ] 
-    #     }
-    # )
-
-
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("match", match))
     application.add_handler(CommandHandler("help", help))
-    application.add_handler(CommandHandler("deleteaccount", delete))
-
-    gender_handler = ConversationHandler(
-        entry_points=[CommandHandler("gender", asking_gender)],
-        states={0: [MessageHandler(filters.Regex("^(Boy|Girl|Other)"), gender)]},
-        fallbacks=[CommandHandler("cancel", cancel)],
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", start)],
+        states={
+            ASKING_GENDER: [CommandHandler("gender", asking_gender)],
+            GENDER: [MessageHandler(filters.Regex("^(Boy|Girl|Other)"), gender)],
+            ASKING_AGE: [CommandHandler("age", asking_age)],
+            AGE: [MessageHandler(filters.TEXT, age)],
+            STARTING_QUIZ: [CommandHandler("quiz", starting_quiz), CommandHandler("age", asking_age)],
+            QUIZ: [MessageHandler(filters.Regex(r'^[1-5]$'), quiz)],
+            MATCH: [CommandHandler("match", match)]
+        },
+        fallbacks=[CommandHandler("cancel", cancel), CommandHandler("deleteme", delete)]
     )
-
-    application.add_handler(gender_handler)
-
-    age_handler = ConversationHandler(
-        entry_points=[CommandHandler("age", asking_age)],
-        states={0: [MessageHandler(filters.Regex(r'^\d+$'), age)]},
-        fallbacks=[CommandHandler("cancel", cancel)]
-    )
-
-    application.add_handler(age_handler)
-
-    quiz_handler = ConversationHandler(
-        entry_points=[CommandHandler("quiz", starting_quiz)],
-        states={0: [MessageHandler(filters.Regex(r'^[1-5]$'), quiz)]},
-        fallbacks=[CommandHandler("cancel", cancel)]
-    )
-    application.add_handler(quiz_handler)
+    application.add_handler(conv_handler)
+    application.add_handler(CommandHandler("deleteme", delete))
 
     application.run_polling()
 
